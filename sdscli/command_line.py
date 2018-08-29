@@ -274,6 +274,8 @@ def main():
     parser_ci_add_job.add_argument('--branch', '-b', default=None,
                                    help="register git branch instead of release")
     parser_ci_add_job.add_argument('--token', '-k', action='store_true', help="use configured OAuth token")
+    parser_ci_add_job.add_argument('--common', '-c', action='store_true',
+                             help="Use common on-premise CI server")
     parser_ci.set_defaults(func=ci)
 
     # parser for pkg

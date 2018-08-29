@@ -48,14 +48,19 @@ def add_job(args):
     else: repo_url = args.repo
 
     logger.debug("repo_url: {}".format(repo_url))
+    
+    isCommon = False
+
+    if args.common:
+	isCommon = True
 
     # add jenkins job for branch or release
     if args.branch is None:
         execute(fab.add_ci_job_release, repo_url, args.storage, args.uid, 
-                args.gid, roles=['ci'])
+                args.gid, isCommon, roles=['ci'])
     else:
         execute(fab.add_ci_job, repo_url, args.storage, args.uid, 
-                args.gid, args.branch, roles=['ci'])
+                args.gid, args.branch, isCommon, roles=['ci'])
 
     # reload
     execute(fab.reload_configuration, roles=['ci'])

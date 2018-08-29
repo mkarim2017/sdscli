@@ -590,7 +590,7 @@ def python_setup_develop(node_type, dest):
 # ci functions
 ##########################
 
-def add_ci_job(repo, proto, uid=1001, gid=1001, branch=None, release=False):
+def add_ci_job(repo, proto, uid=1001, gid=1001, branch=None, isCommon=False, release=False):
     with settings(sudo_user=context["JENKINS_USER"]):
         match = repo_re.search(repo)
         if not match:
@@ -608,7 +608,12 @@ def add_ci_job(repo, proto, uid=1001, gid=1001, branch=None, release=False):
         ctx['UID'] = uid
         ctx['GID'] = gid
         job_dir = '%s/jobs/%s' % (ctx['JENKINS_DIR'], job_name)
+	if isCommon:
+	    job_dir = '%s/jobs/%s/%s' % (ctx['JENKINS_DIR'], opwner, job_name)
+        
+
         dest_file = '%s/config.xml' % job_dir
+        
         mkdir(job_dir, None, None)
         chmod('777', job_dir)
         if release: ctx['BRANCH_SPEC'] = "origin/tags/release-*"
@@ -628,8 +633,8 @@ def add_ci_job(repo, proto, uid=1001, gid=1001, branch=None, release=False):
         run("rm tmp-jenkins-upload")
 
 
-def add_ci_job_release(repo, proto, uid=1001, gid=1001):
-    add_ci_job(repo, proto, uid, gid, release=True)
+def add_ci_job_release(repo, proto, uid=1001, gid=1001, isCommon=False):
+    add_ci_job(repo, proto, uid, gid, isCommon, release=True)
 
 
 def reload_configuration():
@@ -849,4 +854,4 @@ def ship_style(bucket=None, encrypt=False):
 def create_zip(zip_dir, zip_file):
     if exists(zip_file): run('rm -rf %s' % zip_file)
     with cd(zip_dir):
-        run('zip -r -9 {} *'.format(zip_file))
+        run('zip -r -9 {} *'.format(zip_file))1
