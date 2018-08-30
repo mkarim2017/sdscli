@@ -607,9 +607,10 @@ def add_ci_job(repo, proto, uid=1001, gid=1001, branch=None, isCommon=False, rel
         ctx['BRANCH'] = branch
         ctx['UID'] = uid
         ctx['GID'] = gid
+	venue = ctx['VENUE']
         job_dir = '%s/jobs/%s' % (ctx['JENKINS_DIR'], job_name)
 	if isCommon:
-	    job_dir = '%s/jobs/%s/%s' % (ctx['JENKINS_DIR'], opwner, job_name)
+	    job_dir = '%s/jobs/%s/%s' % (ctx['JENKINS_DIR'], venue, job_name)
         
 
         dest_file = '%s/config.xml' % job_dir
