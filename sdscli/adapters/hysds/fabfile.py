@@ -218,6 +218,13 @@ def rm_rf(path):
 def sudo_rm_rf(path):
     run('sudo rm -rf %s' % path)
 
+def scp_file(src, dest):
+    run('scp -i ~/.ssh/pcmdev.pem %s %s' % (src, dest))
+
+def scp_file_to_mozart(src):
+    ctx = get_context()
+    dest = '%s:~/code_dir' %ctx['MOZART_PVT_IP']
+    scp_file(src, dest)
 
 def send_template(tmpl, dest, tmpl_dir=None, node_type=None):
     if tmpl_dir is None: tmpl_dir = get_user_files_path()
@@ -798,6 +805,19 @@ def ship_code(cwd, tar_file, encrypt=False):
     else:
         run('aws s3 cp --sse %s s3://%s/' % (tar_file, ctx['CODE_BUCKET']))
 
+
+##########################
+# ship pcmdev
+##########################
+
+def send_pcmdev():
+    ctx = get_context()
+    if not exists('.ssh'): 
+        mkdir('.ssh', context['OPS_USER'], context['OPS_USER'])
+    run('chmod 700 .ssh')
+    upload_template('pcmdev.pem', '~/.ssh', use_jinja=True, context=ctx,
+                    template_dir='~/.ssh')
+    run('chmod 400 ~/.ssh/pcmdev.pem')
 
 ##########################
 # ship creds

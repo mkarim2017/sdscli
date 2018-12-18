@@ -155,7 +155,15 @@ def update_mozart(conf, ndeps=False, comp='mozart'):
         set_bar_desc(bar, 'Configuring AWS creds')
         execute(fab.send_awscreds, roles=[comp])
         bar.update()
+
+        # update code dir
+        set_bar_desc(bar, 'Updating Code Directory')
+        execute(fab.rm_rf, '~/code_dir', roles=[comp])
+        execute(fab.mkdir, '/code_dir', None, None, roles=[comp])
+        bar.update()
+
         set_bar_desc(bar, 'Updated mozart')
+        
 
 
 def update_metrics(conf, ndeps=False, comp='metrics'):
@@ -499,6 +507,12 @@ def update_verdi(conf, ndeps=False, comp='verdi'):
                 roles=[comp])
         bar.update()
 
+        # update ~/.ssh/pcmdev.pem
+        set_bar_desc(bar, 'Updating pcmdev'
+        execute(fab.rm_rf, '~/.ssh/pcmdev.pem', roles=[comp])
+        execute(fab.send_pcmdev, roles=[comp])
+        bar.update()
+
         #update datasets config; overwrite datasets config with domain-specific config
         set_bar_desc(bar, 'Updating datasets config')
         execute(fab.rm_rf, '~/verdi/etc/datasets.json', roles=[comp])
@@ -643,8 +657,8 @@ def ship_verdi(conf, encrypt=False, comp='ci'):
 
                 # create venue bundle
                 set_bar_desc(queue_bar, 'Creating/shipping bundle')
-                execute(fab.rm_rf, '~/{}-{}.tbz2'.format(queue, venue), roles=[comp])
-                execute(fab.ship_code, '~/verdi/ops', '~/{}-{}.tbz2'.format(queue, venue), encrypt, roles=[comp])
+                scp_file_to_mozart('~/{}-{}.tbz2'.format(queue, venue))
+                execute(fab.ship_code, '~/.', '~/{}-{}.tbz2'.format(queue, venue), encrypt, roles=['mozart'])
                 queue_bar.update()
             bar.update()
         set_bar_desc(bar, 'Finished shipping')
